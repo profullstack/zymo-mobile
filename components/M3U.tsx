@@ -2,145 +2,221 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Select,
-  TextInput,
-  TouchableOpacity,
-  FlatList,
-  Spinner,
   StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
+  CheckBox,
+  Linking,
+  Picker,
 } from "react-native";
+import Spinner from "./Spinner"; // Ensure this component exists in your project
+// import AffiliateLinks from "./AffiliateLinks"; // Ensure this component exists in your project
+// import LiveSubNav from "./navbars/LiveSubNav"; // Ensure this component exists in your project
+import VideoPlayer from "./VideoPlayer"; // Ensure this component exists in your project
 
-const LiveSubNav = () => <Text>LiveSubNav</Text>;
-const AffliateLinks = () => <Text>AffliateLinks</Text>;
-
-const channels = [
-  // Example data
-  { id: 1, name: "Channel 1" },
-  { id: 2, name: "Channel 2" },
-];
-
-const m3us = [
-  // Example data
-  { id: 1, name: "Provider 1" },
-  { id: 2, name: "Provider 2" },
-];
-
-function App() {
-  const [selectedProvider, setSelectedProvider] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isChannelListOpen, setChannelListOpen] = useState(false);
+const MyComponent = ({ m3us = [] }) => {
+  const [channels, setChannels] = useState([]);
   const [filterValue, setFilterValue] = useState("");
   const [selectedChannel, setSelectedChannel] = useState(null);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChannelListOpen, setIsChannelListOpen] = useState(false);
+  const [mp4, setMp4] = useState(false);
+  const [filteredChannels, setFilteredChannels] = useState([]);
 
   useEffect(() => {
-    if (selectedProvider) {
-      fetchChannels(selectedProvider);
-    }
-  }, [selectedProvider]);
+    // Equivalent to Svelte's onMount
+    setIsLoading(false);
+  }, []);
 
-  async function handleProviderChange(event) {
-    const provider = event.nativeEvent.value;
-    if (provider && provider !== "-- Select Provider --") {
-      setSelectedProvider(provider);
-      setIsLoading(true); // Simulating loading
-    }
-  }
+  useEffect(() => {
+    // Filter channels whenever channels, filterValue, or mp4 change
+    let filtered = channels;
 
-  const closeChannelList = () => {
-    setChannelListOpen(false);
+    if (filterValue) {
+      filtered = filtered.filter((channel) =>
+        channel.name.toLowerCase().includes(filterValue.toLowerCase())
+      );
+    }
+
+    if (mp4) {
+      filtered = filtered.filter((channel) => channel.isMp4);
+    }
+
+    setFilteredChannels(filtered);
+  }, [channels, filterValue, mp4]);
+
+  const fetchChannels = async (provider) => {
+    setIsLoading(true);
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch(
+        `https://your-api.com/channels?provider=${provider}`
+      );
+      const data = await response.json();
+      setChannels(data.channels);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleProviderChange = async (value) => {
+    if (value && value !== "-- Select Provider --") {
+      setSelectedProvider(value);
+      await fetchChannels(value);
+    }
+  };
+
+  const selectChannel = (channel) => {
+    setSelectedChannel(channel);
+    setIsChannelListOpen(false);
   };
 
   return (
-    <View style={styles.container}>
-      <LiveSubNav />
-      <AffliateLinks />
-      <View style={styles.filterContainer}>
-        <Text>Filter:</Text>
-        <View style={styles.filterInputContainer}>
-          <TextInput
-            placeholder="Type to filter channels..."
-            value={filterValue}
-            onChangeText={setFilterValue}
-            onEndEditing={() => setChannelListOpen(true)}
-            onFocus={() => setChannelListOpen(true)}
-          />
-          {isLoading && <Spinner color="#672ad6" />}
+    <View style={styles.mainContent}>
+      {/* <LiveSubNav />
+      <AffiliateLinks /> */}
+
+      <View style={styles.field}>
+        <Text style={styles.boldText}>Filter:</Text>
+        <View style={styles.checkboxContainer}>
+          <CheckBox value={mp4} onValueChange={setMp4} />
+          <Text>TV Shows and Movies only</Text>
         </View>
       </View>
+
+      <View style={styles.providerContainer}>
+        <Picker
+          selectedValue={selectedProvider}
+          style={styles.picker}
+          onValueChange={handleProviderChange}
+        >
+          <Picker.Item label="-- Select Provider --" value={null} />
+          {m3us.map((provider) => (
+            <Picker.Item
+              label={provider.name}
+              value={provider.id}
+              key={provider.id}
+            />
+          ))}
+        </Picker>
+        {isLoading && <ActivityIndicator color="#672ad6" />}
+      </View>
+
       {selectedProvider && (
-        <Text style={styles.link}>
-          <TouchableOpacity onPress={() => console.log("EGP")}>
-            View EGP
-          </TouchableOpacity>
+        <Text style={styles.h4}>
+          <Text
+            style={styles.linkText}
+            onPress={() =>
+              Linking.openURL(`/live/stream/${selectedProvider}/epg`)
+            }
+          >
+            View EPG
+          </Text>
         </Text>
       )}
-      <Text>Select a Channel</Text>
-      <TextInput
-        placeholder="Type to filter channels..."
-        value={filterValue}
-        onChangeText={setFilterValue}
-        onFocus={() => setChannelListOpen(true)}
-        onBlur={() => closeChannelList()}
-      />
-      {isChannelListOpen && (
-        <FlatList
-          data={filteredChannels(filterValue, channels).map(
-            (channel) => channel.name
-          )}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => console.log(`Selected: ${item}`)}>
-              <Text style={styles.channelItem}>{item}</Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => `channel-${index}`}
+
+      <Text style={styles.h4}>Select a Channel</Text>
+
+      <View style={styles.filterContainer}>
+        <TextInput
+          style={styles.filterInput}
+          placeholder="Type to filter channels..."
+          value={filterValue}
+          onChangeText={(text) => {
+            setFilterValue(text);
+            setIsChannelListOpen(true);
+          }}
+          onFocus={() => setIsChannelListOpen(true)}
+          onBlur={() => setIsChannelListOpen(false)}
         />
-      )}
+        {isChannelListOpen && (
+          <FlatList
+            data={filteredChannels}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => selectChannel(item)}>
+                <Text style={styles.channelItem}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
+            style={styles.channelList}
+          />
+        )}
+      </View>
+
       {selectedChannel && (
-        <View>
-          <Text>{selectedChannel.name}</Text>
-          {/* VideoPlayer component would go here */}
-        </View>
+        <>
+          <Text style={styles.h2}>{selectedChannel.name}</Text>
+          <VideoPlayer channel={selectedChannel} />
+        </>
       )}
     </View>
   );
-}
-
-function filteredChannels(filterValue, channels) {
-  if (!filterValue) return channels;
-  return channels.filter((channel) =>
-    channel.name.toLowerCase().includes(filterValue.toLowerCase())
-  );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
+  mainContent: {
+    padding: 16,
   },
-  filterContainer: {
-    marginBottom: 15,
+  field: {
+    marginVertical: 8,
   },
-  filterInputContainer: {
+  boldText: {
+    fontWeight: "bold",
+  },
+  checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
-    width: "100%",
-    maxHeight: 40,
+  },
+  providerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  picker: {
+    height: 50,
+    flex: 1,
+  },
+  h4: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 8,
+  },
+  h2: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginVertical: 8,
+  },
+  filterContainer: {
+    position: "relative",
+    zIndex: 2,
+  },
+  filterInput: {
+    marginBottom: 16,
     borderColor: "#ccc",
     borderWidth: 1,
-    borderRadius: 8,
     padding: 8,
   },
-  link: {
-    marginTop: 20,
+  channelList: {
+    position: "absolute",
+    width: "100%",
+    maxHeight: 300,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   channelItem: {
     padding: 8,
-    backgroundColor: "#f9f9f9",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
-    cursor: "pointer",
+  },
+  linkText: {
+    color: "blue",
+    textDecorationLine: "underline",
   },
 });
 
-export default App;
+export default MyComponent;
