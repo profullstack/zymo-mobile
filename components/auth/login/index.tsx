@@ -1,75 +1,124 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { Feather } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { FormInput } from "@/components/input";
+import { useForm } from "react-hook-form";
+import { validateEmail } from "@/utils/libs";
+import { CustomButton } from "@/components/button";
+import { router } from "expo-router";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "@/redux/slice/auth-slice";
 
 export const LoginScreen = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { loading } = useSelector(
+    (state: any) => state.auth
+  );
+  const default_values = {
+    email: "",
+    password: "",
+  };
 
-  const handleLogin = () => {
-    setIsLoading(true);
-    // Add your login logic here
-    // Simulate a successful login after 2 seconds
-    setTimeout(() => {
-      setIsLoading(false);
-      setError(null);
-      // Navigate to the next screen or display a success message
-    }, 2000);
+  const {
+    handleSubmit,
+    control,
+    formState: { errors, isValid, isDirty },
+  } = useForm({
+    mode: "onChange",
+    criteriaMode: "all",
+    defaultValues: default_values,
+  });
+
+  const onNext = () => {
+    //@ts-ignore
+    router.push("/(screens)/(home)/dashboard");
+    console.log("first")
+  
+  };
+
+  const onSubmit = (data: any) => {
+  
+    const payload = {
+      email: data?.email,
+      password: data?.password,
+    };
+    //@ts-ignore
+    dispatch(login({ data: payload, callback: onNext }));
   };
 
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#2c3e50', '#4ca1af']}
+        colors={["#2c3e50", "#4ca1af"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.background}
       />
       <View style={styles.formContainer}>
         <Text style={styles.title}>Welcome Back</Text>
-        <View style={styles.inputContainer}>
-          <Feather name="user" size={24} color="#6b7280" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Username"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            autoCorrect={false}
+        <View
+          style={{
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          <FormInput
+            error={errors?.email?.message}
+            label="Email"
+            required={"Email is required"}
+            validate={(value: string) => validateEmail(value ?? "")}
+            placeholder="Enter your email"
+            name="email"
+            control={control}
+            editable={true}
+            input_width={"100%"}
+          />
+
+          <FormInput
+            type="password"
+            error={errors?.password?.message}
+            label="Password"
+            required={"Password is required"}
+            placeholder="Enter your password"
+            name="password"
+            control={control}
+            editable={true}
+            input_width={"100%"}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <Feather name="lock" size={24} color="#6b7280" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-        {error && (
-          <Text style={styles.error}>
-            {error}
-          </Text>
-        )}
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <LinearGradient
-            colors={['#4ca1af', '#2c3e50']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.buttonGradient}
-          >
-            {isLoading ? (
-              <Feather name="loader" size={24} color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Log In</Text>
-            )}
-          </LinearGradient>
-        </TouchableOpacity>
+
+        <CustomButton
+          loading={loading}
+          // button_color={Colors.primaryColor}
+          disabled_color="#C2C0C0"
+          // disabled={isDirty === false || isValid === false}
+          onPress={handleSubmit(onSubmit)}
+          text_type={"regular"}
+          text_style={{
+            fontWeight: "400",
+            fontSize: 14,
+            lineHeight: 19.12,
+            textAlign: "center",
+          }}
+          button_style={{
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: 48,
+            display: "flex",
+            borderWidth: 0,
+            borderRadius: 8,
+          }}
+        >
+          <Text style={styles.buttonText}>Log In</Text>
+        </CustomButton>
       </View>
     </View>
   );
@@ -78,34 +127,36 @@ export const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#000",
+    alignItems: "center",
+    justifyContent: "center",
   },
   background: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
     bottom: 0,
   },
   formContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     paddingHorizontal: 32,
     paddingVertical: 48,
     borderRadius: 8,
-    width: '80%',
+    width: "80%",
     maxWidth: 400,
+    flexDirection: "column",
+    gap: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 24,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
   },
   icon: {
@@ -113,8 +164,8 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    color: '#fff',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    color: "#fff",
     borderRadius: 4,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -123,21 +174,22 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 24,
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   buttonGradient: {
     paddingVertical: 16,
     paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   error: {
-    color: '#f87171',
+    color: "#f87171",
     fontSize: 14,
     marginTop: 8,
   },

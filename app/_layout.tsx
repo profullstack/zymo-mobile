@@ -1,9 +1,10 @@
 import "react-native-gesture-handler";
 import React, { useEffect, useState } from "react";
-import { router, Stack, } from "expo-router";
+import { router, Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar, useColorScheme } from "react-native";
-
+import { Provider } from "react-redux";
+import { store } from "@/redux/store";
 
 const CustomLayout = ({ children }: any) => {
   return (
@@ -24,6 +25,7 @@ const InitialLayout = () => {
           name="(screens)/(auth)/login"
           options={{ headerShown: false }}
         />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen
           name="(screens)/(home)"
           options={{ headerShown: false }}
@@ -34,13 +36,13 @@ const InitialLayout = () => {
 };
 
 const RootLayout = () => {
-
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
         <CustomLayout>
           <InitialLayout />
         </CustomLayout>
+      </Provider>
     </GestureHandlerRootView>
   );
 };
