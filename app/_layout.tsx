@@ -1,37 +1,48 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import "react-native-gesture-handler";
+import React, { useEffect, useState } from "react";
+import { router, Stack, } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StatusBar, useColorScheme } from "react-native";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+const CustomLayout = ({ children }: any) => {
+  return (
+    <>
+      <StatusBar backgroundColor="#ffffff" />
+      {children}
+    </>
+  );
+};
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+const InitialLayout = () => {
+  return (
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+      <Stack>
+        <Stack.Screen
+          name="(screens)/(auth)/login"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="(screens)/(home)"
+          options={{ headerShown: false }}
+        />
+      </Stack>
+    </>
+  );
+};
 
-  if (!loaded) {
-    return null;
-  }
+const RootLayout = () => {
+
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+        <CustomLayout>
+          <InitialLayout />
+        </CustomLayout>
+    </GestureHandlerRootView>
   );
-}
+};
+
+export default RootLayout;
