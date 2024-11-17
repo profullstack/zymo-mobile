@@ -5,11 +5,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar, useColorScheme } from "react-native";
 import { Provider } from "react-redux";
 import { store } from "@/redux/store";
+import { Colors } from "@/constants/Colors";
 
 const CustomLayout = ({ children }: any) => {
   return (
     <>
-      <StatusBar backgroundColor="#ffffff" />
+      <StatusBar backgroundColor={Colors.backgroundColor} />
       {children}
     </>
   );
@@ -18,7 +19,7 @@ const CustomLayout = ({ children }: any) => {
 const InitialLayout = () => {
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="light-content" backgroundColor={Colors.backgroundColor} />
 
       <Stack>
         <Stack.Screen
