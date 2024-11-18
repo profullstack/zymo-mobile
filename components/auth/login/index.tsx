@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   View,
@@ -38,13 +38,18 @@ export const LoginScreen = () => {
 
   const onNext = () => {
     //@ts-ignore
-    router.push("/(screens)/(home)/dashboard");
+    router.push("/(screens)/(home)/home");
     console.log("first")
   
   };
 
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     onNext();
+  //   }, 3000);
+  // }, []);
+
   const onSubmit = (data: any) => {
-  
     const payload = {
       email: data?.email,
       password: data?.password,
@@ -98,7 +103,7 @@ export const LoginScreen = () => {
           loading={loading}
           // button_color={Colors.primaryColor}
           disabled_color="#C2C0C0"
-          // disabled={isDirty === false || isValid === false}
+          disabled={isDirty === false || isValid === false}
           onPress={handleSubmit(onSubmit)}
           text_type={"regular"}
           text_style={{
