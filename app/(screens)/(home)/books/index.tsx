@@ -1,11 +1,12 @@
-import { View, Text } from 'react-native'
+import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
+import { BooksSection } from '@/components/home/books/bookssection'
 
 const index = () => {
   return (
-    <View>
-      <Text>books</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+    <BooksSection/>
+  </SafeAreaView>
   )
 }
 

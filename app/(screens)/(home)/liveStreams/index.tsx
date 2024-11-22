@@ -1,11 +1,12 @@
-import { View, Text } from 'react-native'
+import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
+import { LiveTvSection } from '@/components/home/livestreams/livetvsection'
 
 const index = () => {
   return (
-    <View>
-      <Text>liveStreams</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <LiveTvSection/>
+    </SafeAreaView>
   )
 }
 
