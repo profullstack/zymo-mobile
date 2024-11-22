@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, SafeAreaView } from "react-native";
+import React from "react";
+import { PodcastSection } from "@/components/home/podcasts/podcastsection";
 
 const index = () => {
   return (
-    <View>
-      <Text>podcasts</Text>
-    </View>
-  )
-}
+    <SafeAreaView style={{ flex: 1 }}>
+      <PodcastSection />
+    </SafeAreaView>
+  );
+};
 
-export default index
+export default index;
