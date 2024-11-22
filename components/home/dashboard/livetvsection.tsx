@@ -3,7 +3,6 @@ import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { LiveTvCard } from "./livetvcard";
 import { AntDesign } from "@expo/vector-icons";
-import { router } from "expo-router";
 
 export const LiveTvSection = () => {
   return (
@@ -17,7 +16,6 @@ export const LiveTvSection = () => {
           marginBottom: 20,
         }}
       >
-      Live Tv
       </Text>
 
       <FlashList
@@ -32,9 +30,7 @@ export const LiveTvSection = () => {
         ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
       />
 
-<Pressable style={{ flexDirection: "row", alignItems: "center",gap:7}} onPress={() => {
-        router.push("/liveStreams")
-      }}>
+
         <Text
           style={{
             fontWeight: "500",

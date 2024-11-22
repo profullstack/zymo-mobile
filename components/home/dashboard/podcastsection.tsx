@@ -3,7 +3,6 @@ import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { PodcastCard } from "./podcastcard";
 import { AntDesign } from "@expo/vector-icons";
-import { router } from "expo-router";
 
 export const PodcastSection = () => {
   return (
@@ -17,7 +16,6 @@ export const PodcastSection = () => {
           marginBottom: 20,
         }}
       >
-        Podcasts
       </Text>
 
       <FlashList
@@ -32,12 +30,7 @@ export const PodcastSection = () => {
         ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
       />
 
-      <Pressable
-        style={{ flexDirection: "row", alignItems: "center", gap: 7 }}
-        onPress={() => {
-          router.push("/podcasts");
-        }}
-      >
+
         <Text
           style={{
             fontWeight: "500",
