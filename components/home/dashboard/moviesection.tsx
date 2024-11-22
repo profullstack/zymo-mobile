@@ -3,6 +3,7 @@ import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { MovieCard } from "./moviecard";
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { router } from "expo-router";
 
 export const MovieSection = () => {
   return (
@@ -16,6 +17,7 @@ export const MovieSection = () => {
           marginBottom: 20,
         }}
       >
+       Movies
       </Text>
 
       <FlashList
@@ -30,7 +32,9 @@ export const MovieSection = () => {
         ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
       />
 
-
+      <Pressable style={{ flexDirection: "row", alignItems: "center",gap:7}} onPress={() => {
+        router.push("/movies")
+      }}>
         <Text
           style={{
             fontWeight: "500",

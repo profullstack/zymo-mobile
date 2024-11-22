@@ -3,6 +3,7 @@ import React from "react";
 import { FlashList } from "@shopify/flash-list";
 import { MusicCard } from "./musiccard";
 import { AntDesign } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export const MusicSection = () => {
   return (
@@ -16,6 +17,7 @@ export const MusicSection = () => {
           marginBottom: 20,
         }}
       >
+       Music
       </Text>
 
       <FlashList
@@ -30,7 +32,9 @@ export const MusicSection = () => {
         ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
       />
 
-
+<Pressable style={{ flexDirection: "row", alignItems: "center",gap:7}} onPress={() => {
+        router.push("/musics")
+      }}>
         <Text
           style={{
             fontWeight: "500",
