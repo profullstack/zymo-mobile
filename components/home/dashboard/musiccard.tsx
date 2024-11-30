@@ -1,9 +1,13 @@
 import { Image } from "expo-image";
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
 export const MusicCard = () => {
+  const handlePress = () => {
+    router.replace(`/(screens)/(home)/musics/screens/${1}`);
+  };
   return (
-    <View>
+    <Pressable onPress={handlePress}>
       <View
         style={{
           backgroundColor: "#202020",
@@ -31,32 +35,30 @@ export const MusicCard = () => {
             source={require("@/assets/images/mv.png")}
           />
         </View>
-        <View style={{flexDirection: "column", gap: 10}}>
-
-        <Text
-          style={{
-            fontWeight: "700",
-            fontSize: 25,
-            lineHeight: 29.62,
-            color: "white",
-            textAlign: "left",
-          }}
-        >
-          Star Wars
-        </Text>
-        <Text
-          style={{
-            fontWeight: "400",
-            fontSize: 22,
-            lineHeight: 26.66,
-            color: "white",
-          }}
-        >
-          Fantasy, Action, Dram
-        </Text>
+        <View style={{ flexDirection: "column", gap: 10 }}>
+          <Text
+            style={{
+              fontWeight: "700",
+              fontSize: 25,
+              lineHeight: 29.62,
+              color: "white",
+              textAlign: "left",
+            }}
+          >
+            Star Wars
+          </Text>
+          <Text
+            style={{
+              fontWeight: "400",
+              fontSize: 22,
+              lineHeight: 26.66,
+              color: "white",
+            }}
+          >
+            Fantasy, Action, Dram
+          </Text>
         </View>
-
       </View>
-    </View>
+    </Pressable>
   );
 };

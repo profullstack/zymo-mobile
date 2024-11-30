@@ -1,9 +1,16 @@
 import { Image } from "expo-image";
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
 export const MovieCard = () => {
+
+  const handlePress = () => {
+    router.push(`/(screens)/(home)/movies/screens/${1}`);
+  }
   return (
-    <View>
+    <Pressable
+    onPress={handlePress}
+  >
       <View
         style={{
           backgroundColor: "#202020",
@@ -70,6 +77,6 @@ export const MovieCard = () => {
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
