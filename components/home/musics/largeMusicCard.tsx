@@ -1,9 +1,13 @@
 import { Image } from "expo-image";
-import { Text, View } from "react-native";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
 export const LargeMusicCard = () => {
+  const handlePress = () => {
+    router.replace(`/(screens)/(home)/musics/screens/${1}`);
+  };
   return (
-    <View>
+    <Pressable onPress={handlePress}>
       <View
         style={{
           backgroundColor: "#202020",
@@ -71,6 +75,6 @@ export const LargeMusicCard = () => {
         </View>
 
       </View>
-    </View>
+    </Pressable>
   );
 };
