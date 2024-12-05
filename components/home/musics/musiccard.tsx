@@ -1,35 +1,20 @@
+import React from 'react';
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Pressable, Text, View } from "react-native";
-
-export const MusicCard = () => {
-  const handlePress = () => {
-    router.replace(`/(screens)/(home)/musics/screens/${1}`);
-  };
   return (
     <Pressable onPress={handlePress}>
       <View
         style={{
           backgroundColor: "#202020",
-          width: 310.11,
-          height: 277.5,
+          width: "100%",
+          height: 297.5,
           borderRadius: 10,
-          flexDirection: "column",
-          // // justifyContent: "center",
-          // alignItems: "center",
-          gap: 20,
+          marginBottom: 10,
+          
         }}
       >
-        <View
-          style={
-            {
-              // flex: 0,
-              // flexDirection: "column",
-              // // justifyContent: "center",
-              // alignItems: "center",
-            }
-          }
-        >
+        <View>
           <Image
             style={{
               height: 184,
@@ -37,39 +22,49 @@ export const MusicCard = () => {
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
             }}
-            // contentFit="contain"
-            source={require("@/assets/images/mv.png")}
+            source={item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")} // Consider dynamic image source if available
           />
         </View>
-        <View style={{flexDirection: "row", gap: 20, alignItems: "center",paddingHorizontal:15 }}>
-        <Image
+        <View style={{
+          flexDirection: "row", 
+          gap: 20, 
+          alignItems: "center",
+          paddingHorizontal: 15,
+          paddingTop: 10
+        }}>
+          <Image
             style={{
               height: 40,
               width: 40,
               borderRadius: 50,
             }}
-            // contentFit="contain"
-            source={require("@/assets/images/mv.png")}
+            source={item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}  // Consider dynamic image source if available
           />
-          <View style={{ flexDirection: "column", gap: 10 ,padding:5}}>
+          <View style={{ flexDirection: "column", gap: 5 }}>
             <Text
               style={{
                 fontWeight: "700",
                 fontSize: 13,
                 color: "white",
                 textAlign: "left",
+                maxWidth: 240,
               }}
+              numberOfLines={2}
+              ellipsizeMode="tail"
             >
-              Star Wars
+              {cleanSongName}
             </Text>
             <Text
               style={{
                 fontWeight: "200",
                 fontSize: 13,
                 color: "white",
+                maxWidth: 240,
               }}
+              numberOfLines={4}
+              ellipsizeMode="tail"
             >
-              Fantasy, Action, Dram
+              {artistName} - {item.album}
             </Text>
           </View>
         </View>

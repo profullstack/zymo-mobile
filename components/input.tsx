@@ -1,12 +1,13 @@
-import { memo, ReactNode, useState } from "react";
+import { memo, ReactNode, useEffect, useMemo, useState } from "react";
 import { Controller } from "react-hook-form";
-import { Dimensions, Pressable, Text, TextInput, View } from "react-native";
+import { Dimensions, Pressable, Text, TextInput, useWindowDimensions, View } from "react-native";
 import EyeClosed from "phosphor-react-native/src/icons/EyeClosed";
 import Eye from "phosphor-react-native/src/icons/Eye";
 import WarningCircle from "phosphor-react-native/src/icons/WarningCircle";
 import MapPinLine from "phosphor-react-native/src/icons/MapPinLine";
 import MagnifyingGlass from "phosphor-react-native/src/icons/MagnifyingGlass";
 import { Image } from "expo-image";
+
 
 
 interface FormInputProps {
@@ -342,4 +343,3 @@ export const CommentFormInput = memo (({
       name={name}
     />
   );
-});

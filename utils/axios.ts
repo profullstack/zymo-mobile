@@ -5,12 +5,14 @@ import { router } from 'expo-router';
 const baseURL = "https://zymo.tv/api/";
 
 const instance = axios.create({
+ 
   baseURL: baseURL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
+
 
 instance.interceptors.request.use(
   async (config) => {

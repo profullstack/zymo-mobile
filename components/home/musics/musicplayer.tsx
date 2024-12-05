@@ -12,16 +12,11 @@ import { Pressable, Text, View } from "react-native";
 import { Audio } from "expo-av";
 import { MusicCard } from "./musiccard";
 import { FlashList } from "@shopify/flash-list";
-
-export const MusicPlayer = () => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
-
-  const soundRef = useRef<Audio.Sound | null>(null);
-
   const circleSize = 12;
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
@@ -68,7 +63,6 @@ export const MusicPlayer = () => {
           // Load and play new sound
           const { sound, status } = await Audio.Sound.createAsync(
             {
-              uri: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
             },
             {
               shouldPlay: true,
@@ -112,7 +106,7 @@ export const MusicPlayer = () => {
           borderWidth: 1,
           borderColor: "#141414",
           borderRadius: 8,
-          width: 273,
+
           height: 389,
           flexDirection: "row",
           justifyContent: "center",
@@ -120,16 +114,11 @@ export const MusicPlayer = () => {
         }}
       >
         <Image
-          source={require("@/assets/images/logo.svg")}
-          style={{ height: "100%", width: "100%" }}
           contentFit="contain"
         />
       </View>
 
       <View style={{ paddingHorizontal:20 }}>
-        <Text style={{ fontWeight: "700", fontSize: 16, color: "white" }}>Track 1</Text>
-        <Text style={{ fontWeight: "400", fontSize: 12, color: "white" }}>
-          Julia Wolf, ayokay, Khalid{" "}
         </Text>
       </View>
 
@@ -224,7 +213,7 @@ export const MusicPlayer = () => {
         </Pressable>
       </View>
 
-      <View style={{ marginTop: 10 ,paddingHorizontal:20,flexDirection: "column", gap: 20  }}>
+
         <Text style={{ fontWeight: "700", fontSize: 16, color: "white" }}>Next in queue</Text>
 
         <FlashList
@@ -236,7 +225,6 @@ export const MusicPlayer = () => {
             horizontal
             ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
           />
-      </View>
     </ScrollView>
   );
 };

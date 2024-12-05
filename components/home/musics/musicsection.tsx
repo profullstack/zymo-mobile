@@ -1,43 +1,115 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
 import React, { useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { MusicCard } from "./musiccard";
 import { AntDesign } from "@expo/vector-icons";
-import { FilterTabNav } from "./filterTabNav";
 import { Colors } from "@/constants/Colors";
-import { LargeMusicCard } from "./largeMusicCard";
+import { SearchInput } from "@/components/input";
+import { getMusic, setMusicData } from "@/redux/slice/home-slice";
+import { useDispatch, useSelector } from "react-redux";
 
 export const MusicSection = () => {
+  const dispatch = useDispatch();
   const [selectedTab, setSelectedTab] = useState("All");
+
+  const { musics_data, fetching_musics_data } = useSelector((state: any) => state.home);
+
+  const handleUpdateSearch = (text: string) => {
+    const payload = {
+      search: text,
+    }
+    //@ts-ignore
+    dispatch(getMusic(payload));
+  }
+
+  const handleBlur = () => {
+    dispatch(setMusicData(null));
+  }
+
+  const transformMusicData = (musicData: any) => {
+    const flattenedItems: any = [];
+  
+    Object.keys(musicData).forEach(albumKey => {
+      const albumData = musicData[albumKey];
+      
+      Object.keys(albumData).forEach(cdKey => {
+        const cdItems = albumData[cdKey];
+        
+        cdItems.forEach((item: any) => {
+          flattenedItems.push({
+            ...item,
+            artist: albumKey,
+            album: cdKey
+          });
+        });
+      });
+    });
+  
+    return flattenedItems;
+  };
+
+  // Loader component for FlashList
+  const ListLoader = () => (
+    <View style={{ 
+      flex: 1, 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: 200 
+    }}>
+      <ActivityIndicator 
+        size="large" 
+      />
+    </View>
+  );
+
+  if (!musics_data) {
+    return (
+      <View style={{ 
+        flex: 1, 
+        alignItems: "center", 
+        backgroundColor: Colors.backgroundColor 
+      }}>
+        <View style={{ marginVertical: 10 }}>
+          <SearchInput 
+            placeholder="Search for music" 
+            updateSearch={handleUpdateSearch} 
+            handleBlur={handleBlur} 
+          />
+        </View>
+        {fetching_musics_data ? (
+          <ActivityIndicator 
+            size="large" 
+          />
+        ) : (
+          <Text style={{ 
+            fontSize: 18, 
+            fontWeight: "bold", 
+            color: "white" 
+          }}>
+            Search for music
+          </Text>
+        )}
+      </View>
+    );
+  }
+
+  const processedData = transformMusicData(musics_data);
+
   return (
     <ScrollView
       style={{
         flex: 1,
         backgroundColor: Colors.backgroundColor,
         flexDirection: "column",
-        gap: 30,
-     
+        gap: 30,   
       }}
     >
-      <View style={{ flexDirection: "column", gap: 30 ,   padding:20,}}>
+      <View style={{ flexDirection: "column", gap: 30, padding: 20 }}>
         <View style={{ marginVertical: 10 }}>
-          {/* <FilterTabNav
-            selectedTab={selectedTab}
-            onSelectTab={setSelectedTab}
-          /> */}
-        </View>
-
-        <View>
-          <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-              20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-            ]}
-            renderItem={({ item }) => <LargeMusicCard />}
-            estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
+          <SearchInput 
+            placeholder="Search for music" 
+            updateSearch={handleUpdateSearch} 
+            handleBlur={handleBlur} 
           />
         </View>
 
@@ -52,111 +124,15 @@ export const MusicSection = () => {
             Music
           </Text>
           <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-              20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-            ]}
-            renderItem={({ item }) => <MusicCard />}
+            data={processedData}
+            renderItem={({ item }:any) => <MusicCard item={item} />}
             estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
+            ItemSeparatorComponent={() => <View style={{ width: 20, height: 20 }} />}
+            ListEmptyComponent={fetching_musics_data ? ListLoader : null}
+            refreshing={fetching_musics_data}
+            onRefresh={() => {}}
           />
         </View>
-
-        {/* <View style={{ flexDirection: "column", gap: 20 }}>
-          <Text
-            style={{
-              fontWeight: "500",
-              fontSize: 16,
-              color: "white",
-            }}
-          >
-            Fantasy
-          </Text>
-          <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-              20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-            ]}
-            renderItem={({ item }) => <MusicCard />}
-            estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-          />
-        </View>
-
-
-        <View style={{ flexDirection: "column", gap: 20 }}>
-          <Text
-            style={{
-              fontWeight: "500",
-              fontSize: 16,
-              color: "white",
-            }}
-          >
-            Adeventure
-          </Text>
-          <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-              20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-            ]}
-            renderItem={({ item }) => <MusicCard />}
-            estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-          />
-        </View>
-
-
-        <View style={{ flexDirection: "column", gap: 20 }}>
-          <Text
-            style={{
-              fontWeight: "500",
-              fontSize: 16,
-              color: "white",
-            }}
-          >
-            Drama
-          </Text>
-          <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-              20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-            ]}
-            renderItem={({ item }) => <MusicCard />}
-            estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-          />
-        </View>
-
-        <View style={{ flexDirection: "column", gap: 20 }}>
-          <Text
-            style={{
-              fontWeight: "500",
-              fontSize: 16,
-              color: "white",
-            }}
-          >
-            Mystery
-          </Text>
-          <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-              20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
-              36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-            ]}
-            renderItem={({ item }) => <MusicCard />}
-            estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-          />
-        </View> */}
       </View>
     </ScrollView>
   );
