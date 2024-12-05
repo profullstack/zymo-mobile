@@ -1,22 +1,25 @@
-import { Stack } from "expo-router"
+import { router, Stack } from "expo-router";
+import CaretLeft from "phosphor-react-native/src/bold/CaretLeft";
+import { Pressable } from "react-native";
 
 const Layout = () => {
   return (
     <Stack>
       <Stack.Screen
-        name="index" 
+        name="index"
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
       <Stack.Screen
-        name="screens/[singlemusic]" 
+        name="screens/[singlemusic]"
         options={{
-          headerShown: false
+          headerShown: false,
+
         }}
       />
     </Stack>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

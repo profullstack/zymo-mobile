@@ -38,8 +38,7 @@ export const LoginScreen = () => {
 
   const onNext = () => {
     //@ts-ignore
-    router.push("/(screens)/(home)/home");
-    console.log("first")
+    router.replace("/(screens)/(home)/musics");
   
   };
 
