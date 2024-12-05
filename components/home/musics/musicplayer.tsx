@@ -12,32 +12,11 @@ import { Pressable, Text, View } from "react-native";
 import { Audio } from "expo-av";
 import { MusicCard } from "./musiccard";
 import { FlashList } from "@shopify/flash-list";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocalSearchParams } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-export const MusicPlayer = () => {
-  const { musics_data, fetching_musics_data } = useSelector((state: any) => state.home);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
-  const [music, setMusic] = useState<any>(null);
-
-  const soundRef = useRef<Audio.Sound | null>(null);
-
-  useEffect(() => {
-    const fetchMusic = async () => {
-      const music = await AsyncStorage.getItem("musicToPlay");
-      if (music) {
-        setMusic(JSON.parse(music));
-      }
-    }
-
-    fetchMusic();
-  }, []);
-
   const circleSize = 12;
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
@@ -84,7 +63,6 @@ export const MusicPlayer = () => {
           // Load and play new sound
           const { sound, status } = await Audio.Sound.createAsync(
             {
-              uri: music?.url,
             },
             {
               shouldPlay: true,
@@ -128,7 +106,7 @@ export const MusicPlayer = () => {
           borderWidth: 1,
           borderColor: "#141414",
           borderRadius: 8,
-          width: "100%",
+
           height: 389,
           flexDirection: "row",
           justifyContent: "center",
@@ -136,16 +114,11 @@ export const MusicPlayer = () => {
         }}
       >
         <Image
-          source={music?.musicbrainz?.coverArt ? music?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}
-          style={{ height: 200, width: 200 }}
           contentFit="contain"
         />
       </View>
 
       <View style={{ paddingHorizontal:20 }}>
-        <Text style={{ fontWeight: "700", fontSize: 16, color: "white" }}>{music?.songname.replace(/^\(\d+\)\s*\[.*?\]\s*/, '')}</Text>
-        <Text style={{ fontWeight: "400", fontSize: 12, color: "white" }}>
-         {music?.artist || 'Unknown Artist'} - {music?.album}
         </Text>
       </View>
 
@@ -240,7 +213,7 @@ export const MusicPlayer = () => {
         </Pressable>
       </View>
 
-      {/* <View style={{ marginTop: 10 ,paddingHorizontal:20,flexDirection: "column", gap: 20  }}>
+
         <Text style={{ fontWeight: "700", fontSize: 16, color: "white" }}>Next in queue</Text>
 
         <FlashList
@@ -252,7 +225,6 @@ export const MusicPlayer = () => {
             horizontal
             ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
           />
-      </View> */}
     </ScrollView>
   );
 };
