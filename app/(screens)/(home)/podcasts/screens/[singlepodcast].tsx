@@ -1,11 +1,13 @@
-import { View, Text } from 'react-native'
+import { View, Text, SafeAreaView } from 'react-native'
 import React from 'react'
+import { PodcastPlayer } from '@/components/home/podcasts/podcastplayer'
+import { SinglePodcast } from '@/components/home/podcasts/singlepodcast'
 
 const singlepodcast = () => {
   return (
-    <View>
-      <Text>singlepodcast</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <SinglePodcast/>
+    </SafeAreaView>
   )
 }
 

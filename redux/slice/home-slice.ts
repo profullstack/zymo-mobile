@@ -25,12 +25,25 @@ interface DataState {
 
 
 export const getMusic = createAsyncThunk(
-  "getDataBySearchandType",
+  "getMusic",
   async (data: any) => {
     try {
       const response = await services.getDataBySearch(data);
       console.log("getDataBySearchandType", response?.results?.music);
       return response.results.music;
+    } catch (error) {
+      
+    }
+  }
+)
+
+export const getPodcast = createAsyncThunk(
+  "getPodcast",
+  async (data: any) => {
+    try {
+      const response = await services.getDataBySearch(data);
+      console.log("getPodcast", response?.results?.podcasts?.data);
+      return response.results.podcasts.data;
     } catch (error) {
       
     }
@@ -61,6 +74,9 @@ const homeSlice = createSlice({
     setMusicData: (state, action: PayloadAction<any>) => {
       state.musics_data = action.payload;
     },
+    setPodcastData: (state, action: PayloadAction<any>) => {
+      state.podcasts_data = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getMusic.pending, (state) => {
@@ -76,9 +92,23 @@ const homeSlice = createSlice({
       state.error = true;
       state.musics_data = null;
     });
+    builder.addCase(getPodcast.pending, (state) => {
+      state.fetching_podcasts_data = true;
+      state.error = false;
+    });
+    builder.addCase(getPodcast.fulfilled, (state, action) => {
+      state.fetching_podcasts_data = false;
+      state.podcasts_data = action.payload;
+    });
+    builder.addCase(getPodcast.rejected, (state) => {
+      state.fetching_podcasts_data = false;
+      state.error = true;
+      state.podcasts_data = null;
+    });
   },
 });
 export const {
-  setMusicData
+  setMusicData,
+  setPodcastData
 } = homeSlice.actions
 export default homeSlice.reducer;
