@@ -119,6 +119,7 @@ export const MusicSection = () => {
               fontWeight: "500",
               fontSize: 16,
               color: "white",
+              textAlign: "center",
             }}
           >
             Music

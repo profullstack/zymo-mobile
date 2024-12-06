@@ -7,7 +7,8 @@ import WarningCircle from "phosphor-react-native/src/icons/WarningCircle";
 import MapPinLine from "phosphor-react-native/src/icons/MapPinLine";
 import MagnifyingGlass from "phosphor-react-native/src/icons/MagnifyingGlass";
 import { Image } from "expo-image";
-
+import debounce from "lodash.debounce";
+import { Colors } from "@/constants/Colors";
 
 
 interface FormInputProps {
@@ -343,3 +344,86 @@ export const CommentFormInput = memo (({
       name={name}
     />
   );
+});
+
+interface SearchInputProps {
+  placeholder: string;
+  updateSearch: any | Function;
+  padding_width?: number;
+  handleBlur: any;
+}
+
+export const SearchInput = memo(
+  ({
+    placeholder,
+    updateSearch,
+    padding_width = 80,
+    handleBlur,
+  }: SearchInputProps) => {
+    const [isFocused, setIsFocused] = useState(false);
+
+    const { width } = useWindowDimensions();
+    const input_width = width - padding_width;
+    const [value, setValue] = useState("");
+
+    const handleChange = (value: string) => {
+      setValue(value);
+      handleDebounce(value);
+    };
+
+    const handleDebounce = useMemo(() => debounce(updateSearch, 700), []);
+
+    useEffect(() => {
+      return () => {
+        handleDebounce.cancel();
+      };
+    }, []);
+    return (
+      <View
+        style={{
+          backgroundColor: "white",
+          flexDirection: "row",
+          display: "flex",
+          gap: 4,
+          height: 54,
+          alignItems: "center",
+          paddingHorizontal: 10,
+          paddingVertical: 2,
+          borderRadius: 8,
+          borderColor: isFocused ? Colors.backgroundColor : "lightgrey",
+          borderWidth: 1,
+        }}
+      >
+        <MagnifyingGlass size={20} color={"black"} weight="regular" />
+        <TextInput
+          value={value}
+          onChangeText={handleChange}
+          onBlur={() => {
+            setIsFocused(false);
+            handleBlur();
+          }}
+          onFocus={() => setIsFocused(true)}
+          style={{
+            // background
+            width: input_width,
+            height: "100%",
+            paddingHorizontal: 0,
+            borderRadius: 8,
+            borderColor: "transparent",
+            borderWidth: 0,
+            backgroundColor: Colors.light.background,
+            color: "black",
+            fontFamily: "light",
+            fontWeight: "300",
+            fontSize: 12,
+            lineHeight: 16.39,
+          }}
+          editable={true}
+          cursorColor={"black"}
+          placeholder={placeholder}
+          placeholderTextColor={"black"}
+        />
+      </View>
+    );
+  }
+);
