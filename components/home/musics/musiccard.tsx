@@ -23,7 +23,7 @@ interface MusicCardProps {
 }
 
 export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
-  console.log("item", item?.url);
+  console.log("item", item);
   const handlePress = async () => {
     await AsyncStorage.setItem("musicToPlay", JSON.stringify(item));
     router.push(`/(screens)/(home)/musics/screens/${item?.id}`);
@@ -40,8 +40,8 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
       <View
         style={{
           backgroundColor: "#202020",
-          width: "100%",
-          height: 297.5,
+          width: 300,
+          height: 300.5,
           borderRadius: 10,
           marginBottom: 10,
           
@@ -55,7 +55,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
               borderTopLeftRadius: 10,
               borderTopRightRadius: 10,
             }}
-            source={item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")} // Consider dynamic image source if available
+            source={item?.musicbrainz?.coverArt !== "No image available" && item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}  // Consider dynamic image source if available
           />
         </View>
         <View style={{
@@ -71,7 +71,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
               width: 40,
               borderRadius: 50,
             }}
-            source={item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}  // Consider dynamic image source if available
+            source={item?.musicbrainz?.coverArt !== "No image available" && item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}  // Consider dynamic image source if available
           />
           <View style={{ flexDirection: "column", gap: 5 }}>
             <Text
@@ -80,7 +80,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
                 fontSize: 13,
                 color: "white",
                 textAlign: "left",
-                maxWidth: 240,
+                maxWidth: 200,
               }}
               numberOfLines={2}
               ellipsizeMode="tail"
@@ -92,7 +92,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
                 fontWeight: "200",
                 fontSize: 13,
                 color: "white",
-                maxWidth: 240,
+                maxWidth: 200,
               }}
               numberOfLines={4}
               ellipsizeMode="tail"

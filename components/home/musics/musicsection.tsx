@@ -27,16 +27,26 @@ export const MusicSection = () => {
   }
 
   const transformMusicData = (musicData: any) => {
-    const flattenedItems: any = [];
+    const groupedMusicData: { [artist: string]: { [album: string]: any[] } } = {};
   
     Object.keys(musicData).forEach(albumKey => {
       const albumData = musicData[albumKey];
       
+      // Ensure the artist exists in the grouped data
+      if (!groupedMusicData[albumKey]) {
+        groupedMusicData[albumKey] = {};
+      }
+      
       Object.keys(albumData).forEach(cdKey => {
-        const cdItems = albumData[cdKey];
+        // Ensure the album exists for this artist
+        if (!groupedMusicData[albumKey][cdKey]) {
+          groupedMusicData[albumKey][cdKey] = [];
+        }
         
+        // Add songs to the specific album for this artist
+        const cdItems = albumData[cdKey];
         cdItems.forEach((item: any) => {
-          flattenedItems.push({
+          groupedMusicData[albumKey][cdKey].push({
             ...item,
             artist: albumKey,
             album: cdKey
@@ -45,7 +55,7 @@ export const MusicSection = () => {
       });
     });
   
-    return flattenedItems;
+    return groupedMusicData;
   };
 
   // Loader component for FlashList
@@ -124,15 +134,39 @@ export const MusicSection = () => {
           >
             Music
           </Text>
-          <FlashList
-            data={processedData}
-            renderItem={({ item }:any) => <MusicCard item={item} />}
-            estimatedItemSize={200}
-            ItemSeparatorComponent={() => <View style={{ width: 20, height: 20 }} />}
-            ListEmptyComponent={fetching_musics_data ? ListLoader : null}
-            refreshing={fetching_musics_data}
-            onRefresh={() => {}}
-          />
+          {Object.entries(processedData).map(([artist, albums]) => (
+            <View key={artist}>
+              <Text style={{ 
+                color: 'white', 
+                fontSize: 18, 
+                fontWeight: 'bold', 
+                marginBottom: 10 
+              }}>
+                {artist}
+              </Text>
+              {Object.entries(albums).map(([album, songs]) => (
+                <View key={album} style={{ marginBottom: 20 }}>
+                  <Text style={{ 
+                    color: 'white', 
+                    fontSize: 16, 
+                    marginBottom: 10 
+                  }}>
+                    {album}
+                  </Text>
+                  <FlashList
+                    horizontal
+                    data={songs}
+                    renderItem={({ item }:any) => <MusicCard item={item} />}
+                    estimatedItemSize={200}
+                    ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
+                    ListEmptyComponent={fetching_musics_data ? ListLoader : null}
+                    refreshing={fetching_musics_data}
+                    onRefresh={() => {}}
+                  />
+                </View>
+              ))}
+            </View>
+          ))}
         </View>
       </View>
     </ScrollView>

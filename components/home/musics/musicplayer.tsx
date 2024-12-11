@@ -7,55 +7,58 @@ import {
 } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useState, useRef, useEffect } from "react";
-import { ScrollView, StyleSheet } from "react-native";
-import { Pressable, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Pressable, Text, View ,Alert} from "react-native";
 import { Audio } from "expo-av";
-import { MusicCard } from "./musiccard";
-import { FlashList } from "@shopify/flash-list";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system";
 
 export const MusicPlayer = () => {
-  const { musics_data, fetching_musics_data } = useSelector((state: any) => state.home);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
   const [music, setMusic] = useState<any>(null);
+  const [isRepeating, setIsRepeating] = useState(false);
 
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
     const fetchMusic = async () => {
-      const music = await AsyncStorage.getItem("musicToPlay");
-      if (music) {
-        setMusic(JSON.parse(music));
-      }
-    }
-
+      const storedMusic = await AsyncStorage.getItem("musicToPlay");
+      if (storedMusic) setMusic(JSON.parse(storedMusic));
+    };
     fetchMusic();
   }, []);
 
-  const circleSize = 12;
+  useEffect(() => {
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
+  }, []);
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60000);
     const seconds = Math.floor((time % 60000) / 1000);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  const onPlaybackStatusUpdate = async (status: any) => {
+  const onPlaybackStatusUpdate = (status: any) => {
+    console.log("first", status)
     if (status.isLoaded && status.isPlaying) {
-      const progressPercentage = status.positionMillis / status.durationMillis;
-      setProgress(progressPercentage);
+      setProgress(status.positionMillis / status.durationMillis);
       setCurrentTime(status.positionMillis);
-      setTotalDuration(status.durationMillis);
+      setTotalDuration(status.durationMillis? status.durationMillis : 0);
     }
-  
-    if (status.didJustFinish === true) {
-      // Reset player when song ends
-      await resetPlayer();
+
+    if (status.didJustFinish) {
+      if (isRepeating) {
+        soundRef.current?.replayAsync();
+      } else {
+        resetPlayer();
+      }
     }
   };
 
@@ -71,35 +74,37 @@ export const MusicPlayer = () => {
     soundRef.current = null;
   };
 
+  function getProxyUrl(song: { user: any; pass: any; url: any }) {
+    if (song.user && song.pass) {
+      return `https://zymo.tv/proxy?user=${song.user}&pass=${
+        song.pass
+      }&url=${encodeURIComponent(song.url)}`;
+    }
+    return song.url;
+  }
+
   const handlePlayPause = async () => {
+    const token = await AsyncStorage.getItem("token");
     try {
       if (isPlaying) {
-        // Pause the current sound
-        if (soundRef.current) {
-          await soundRef.current.pauseAsync();
-          setIsPlaying(false);
-        }
+        await soundRef.current?.pauseAsync();
+        setIsPlaying(false);
       } else {
         if (!soundRef.current) {
-          // Load and play new sound
-          const { sound, status } = await Audio.Sound.createAsync(
+          const audioUrl = getProxyUrl(music);
+          console.log(audioUrl, "audioUrl");
+          const { sound } = await Audio.Sound.createAsync(
             {
-              uri: music?.url,
+              uri: audioUrl,
             },
-            {
-              shouldPlay: true,
-              isLooping: false,
-            },
+            { shouldPlay: true },
             onPlaybackStatusUpdate
           );
-          
           soundRef.current = sound;
           setSound(sound);
         } else {
-          // Resume from paused position
           await soundRef.current.playFromPositionAsync(currentTime);
         }
-        
         setIsPlaying(true);
       }
     } catch (error) {
@@ -107,159 +112,119 @@ export const MusicPlayer = () => {
     }
   };
 
-  // Clean up sound when component unmounts
-  useEffect(() => {
-    return () => {
-      const unloadSound = async () => {
-        if (soundRef.current) {
-          await soundRef.current.unloadAsync();
-        }
-      };
-      unloadSound();
-    };
-  }, []);
+  const handleSkipBack = async () => {
+    if (soundRef.current) {
+      const newPosition = Math.max(currentTime - 10000, 0); // Skip back 10 seconds
+      await soundRef.current.setPositionAsync(newPosition);
+    }
+  };
+
+  const handleSkipForward = async () => {
+    if (soundRef.current) {
+      const newPosition = Math.min(currentTime + 10000, totalDuration); // Skip forward 10 seconds
+      await soundRef.current.setPositionAsync(newPosition);
+    }
+  };
+
+  const toggleRepeat = () => {
+    setIsRepeating(!isRepeating);
+  };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 0, height: "100%", backgroundColor: "#141414" }}>
-      {/* Rest of the UI remains the same as in the original code */}
-      <View
-        style={{
-          padding: 20,
-          borderWidth: 1,
-          borderColor: "#141414",
-          borderRadius: 8,
-          width: "100%",
-          height: 389,
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center"
-        }}
-      >
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.imageContainer}>
         <Image
-          source={music?.musicbrainz?.coverArt ? music?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}
-          style={{ height: 200, width: 200 }}
+          source={
+            music?.musicbrainz?.coverArt || require("@/assets/images/music.svg")
+          }
+          style={styles.image}
           contentFit="contain"
         />
       </View>
 
-      <View style={{ paddingHorizontal:20 }}>
-        <Text style={{ fontWeight: "700", fontSize: 16, color: "white" }}>{music?.songname.replace(/^\(\d+\)\s*\[.*?\]\s*/, '')}</Text>
-        <Text style={{ fontWeight: "400", fontSize: 12, color: "white" }}>
-         {music?.artist || 'Unknown Artist'} - {music?.album}
+      <View style={styles.detailsContainer}>
+        <Text style={styles.songTitle}>
+          {music?.songname?.replace(/^(\d+)\s*\[.*?\]\s*/, "") ||
+            "Unknown Song"}
         </Text>
+        <Text style={styles.artistAlbum}>{`${
+          music?.artist || "Unknown Artist"
+        } - ${music?.album || "Unknown Album"}`}</Text>
       </View>
 
-      <View style={{ marginTop: 10 ,paddingHorizontal:20 }}>
-        <View
-          style={{
-            width: "100%",
-            marginTop: 10,
-            height: 3,
-            backgroundColor: "gray",
-            borderRadius: 5,
-          }}
-        >
-          <View
-            style={[styles.progressbar, { width: `${progress * 100}%` }]}
-          />
-          <View
-            style={[
-              {
-                position: "absolute",
-                top: -5,
-                width: circleSize,
-                height: circleSize,
-                borderRadius: circleSize / 2,
-                backgroundColor: "white",
-              },
-              {
-                left: `${progress * 100}%`,
-                marginLeft: -circleSize / 2,
-              },
-            ]}
-          />
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBarBackground}>
+          <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
         </View>
-        <View
-          style={{
-            marginTop: 12,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ color: "white", fontSize: 15 }}>
-            {formatTime(currentTime)}
-          </Text>
-
-          <Text style={{ color: "white", fontSize: 15 }}>
-            {formatTime(totalDuration)}
-          </Text>
+        <View style={styles.timeContainer}>
+          <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
+          <Text style={styles.timeText}>{formatTime(totalDuration)}</Text>
         </View>
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: 17,
-          paddingHorizontal:20
-
-        }}
-      >
-        <Pressable>
-          <FontAwesome name="arrows" size={30} color="#03C03C" />
-        </Pressable>
-        <Pressable>
-          <Ionicons name="play-skip-back" size={30} color="white" />
+      <View style={styles.controlsContainer}>
+        <Pressable onPress={handleSkipBack}>
+          <Ionicons name="play-skip-back" size={25} color="white" />
         </Pressable>
         <Pressable onPress={handlePlayPause}>
           {isPlaying ? (
-            <AntDesign name="pausecircle" size={60} color="white" />
+            <AntDesign name="pausecircle" size={45} color="white" />
           ) : (
-            <Pressable
-              onPress={handlePlayPause}
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                backgroundColor: "white",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Entypo name="controller-play" size={26} color="black" />
-            </Pressable>
+            <Entypo name="controller-play" size={45} color="white" />
           )}
         </Pressable>
-        <Pressable>
-          <Ionicons name="play-skip-forward" size={30} color="white" />
+        <Pressable onPress={handleSkipForward}>
+          <Ionicons name="play-skip-forward" size={25} color="white" />
         </Pressable>
-        <Pressable>
-          <Feather name="repeat" size={30} color="#03C03C" />
+        <Pressable onPress={toggleRepeat}>
+          <Feather
+            name="repeat"
+            size={25}
+            color={isRepeating ? "#03C03C" : "white"}
+          />
         </Pressable>
       </View>
-
-      {/* <View style={{ marginTop: 10 ,paddingHorizontal:20,flexDirection: "column", gap: 20  }}>
-        <Text style={{ fontWeight: "700", fontSize: 16, color: "white" }}>Next in queue</Text>
-
-        <FlashList
-            data={[
-              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19
-            ]}
-            renderItem={({ item }) => <MusicCard />}
-            estimatedItemSize={200}
-            horizontal
-            ItemSeparatorComponent={() => <View style={{ width: 20 }} />}
-          />
-      </View> */}
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  progressbar: {
+  container: {
+    flex: 0,
+    height: "100%",
+    backgroundColor: "#141414",
+  },
+  imageContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 35,
+  },
+  image: { height: 200, width: 200 },
+  detailsContainer: { paddingHorizontal: 20 },
+  songTitle: { fontSize: 16, fontWeight: "700", color: "white" },
+  artistAlbum: { fontSize: 12, fontWeight: "400", color: "white" },
+  progressContainer: { paddingHorizontal: 20, marginTop: 25 },
+  progressBarBackground: {
+    height: 3,
+    backgroundColor: "gray",
+    borderRadius: 5,
+  },
+  progressBar: {
     height: "100%",
     backgroundColor: "white",
+  },
+  timeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  timeText: { fontSize: 15, color: "white" },
+  controlsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginTop: 25,
   },
 });
