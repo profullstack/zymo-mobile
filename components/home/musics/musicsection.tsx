@@ -141,6 +141,25 @@ export const MusicSection = () => {
       setOpenAlbum(artist);
     }
   };
+  const handleMusicPress = async (item: MusicItem) => {
+    await AsyncStorage.setItem("musicToPlay", JSON.stringify(item));
+    router.push(`/(screens)/(home)/musics/screens/${item?.id}`);
+  };
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.backgroundColor,
+      }}
+    >
+      <View style={{ marginVertical: 10, paddingHorizontal: 20 }}>
+        <SearchInput
+          placeholder="Search for music"
+          updateSearch={handleUpdateSearch}
+          handleBlur={handleBlur}
+        />
+      </View>
       <ScrollView
         style={{
           flex: 1,
@@ -150,7 +169,6 @@ export const MusicSection = () => {
         }}
       >
         <View style={{ flexDirection: "column", gap: 30, padding: 20 }}>
-
           <View style={{ flexDirection: "column", gap: 20 }}>
             <Text
               style={{
@@ -194,6 +212,70 @@ export const MusicSection = () => {
                   <View style={{ marginBottom: 20 }}>
                     {Object.entries(albums).map(([album, songs]) => (
                       <View key={album}>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            gap: 10,
+                            marginVertical: 20,
+                          }}
+                        >
+                          <Image
+                            style={{
+                              height: 40,
+                              width: 40,
+                              borderRadius: 4,
+                            }}
+                            source={
+                              songs[0]?.musicbrainz?.coverArt !==
+                                "No image available" &&
+                              songs[0]?.musicbrainz?.coverArt
+                                ? { uri: songs[0]?.musicbrainz?.coverArt }
+                                : require("@/assets/images/music.svg")
+                            }
+                          />
+                          <Text
+                            style={{
+                              color: "white",
+                              fontSize: 16,
+                              marginBottom: 10,
+                              maxWidth: "70%",
+                            }}
+                          >
+                            {album}
+                          </Text>
+                        </View>
+                        <FlashList
+                          data={songs}
+                          renderItem={({ item }) => (
+                            <Pressable onPress={() => handleMusicPress(item)}>
+                              <View
+                                style={{
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  gap: 10,
+                                  paddingVertical: 10,
+                                  marginLeft:25
+                                }}
+                              >
+                                <AntDesign name="playcircleo" size={24} color="#682BD7" />
+                                <Text
+                                  style={{
+                                    color: 'white',
+                                    fontSize: 14,
+                                    maxWidth: '80%',
+                                  }}
+                                  numberOfLines={1}
+                                  ellipsizeMode="tail"
+                                >
+                                  {item.songname}
+                                </Text>
+                              </View>
+                            </Pressable>
+                          )}
+                          keyExtractor={(item) => item.id}
+                          ItemSeparatorComponent={() => (
+                            <View style={{ height: 15 }} />
                           )}
                           ListEmptyComponent={
                             fetching_musics_data ? ListLoader : null
