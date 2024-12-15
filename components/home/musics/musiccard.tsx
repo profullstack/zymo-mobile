@@ -23,7 +23,6 @@ interface MusicCardProps {
 }
 
 export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
-
   console.log("item", item);
   const handlePress = async () => {
     await AsyncStorage.setItem("musicToPlay", JSON.stringify(item));
@@ -57,7 +56,6 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
               borderTopRightRadius: 10,
             }}
             source={item?.musicbrainz?.coverArt !== "No image available" && item?.musicbrainz?.coverArt ? item?.musicbrainz?.coverArt : require("@/assets/images/music.svg")}  // Consider dynamic image source if available
-
           />
         </View>
         <View style={{
@@ -82,9 +80,7 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
                 fontSize: 13,
                 color: "white",
                 textAlign: "left",
-
                 maxWidth: 200,
-
               }}
               numberOfLines={2}
               ellipsizeMode="tail"
@@ -96,7 +92,6 @@ export const MusicCard: React.FC<MusicCardProps> = ({ item }) => {
                 fontWeight: "200",
                 fontSize: 13,
                 color: "white",
-
                 maxWidth: 200,
               }}
               numberOfLines={4}
