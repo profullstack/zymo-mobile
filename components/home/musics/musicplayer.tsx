@@ -24,6 +24,19 @@ export const MusicPlayer = () => {
   const soundRef = useRef<Audio.Sound | null>(null);
 
   useEffect(() => {
+    const configureAudio = async () => {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+      });
+    };
+    configureAudio();
+  }, []);
+  
+  useEffect(() => {
     const fetchMusic = async () => {
       const storedMusic = await AsyncStorage.getItem("musicToPlay");
       if (storedMusic) setMusic(JSON.parse(storedMusic));
