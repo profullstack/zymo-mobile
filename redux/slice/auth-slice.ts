@@ -25,6 +25,7 @@ interface AuthState {
 export const login = createAsyncThunk(
   "login",
   async (payload: LoginPayload, { dispatch }) => {
+    console.log("first", payload);
     try {
       const res = await services.login(payload?.data);
       console.log(res?.request?.session?.user, "res session");
