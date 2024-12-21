@@ -15,12 +15,11 @@ import { CustomButton } from "@/components/button";
 import { router } from "expo-router";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/slice/auth-slice";
+import { Image } from "expo-image";
 
 export const LoginScreen = () => {
   const dispatch = useDispatch();
-  const { loading } = useSelector(
-    (state: any) => state.auth
-  );
+  const { loading } = useSelector((state: any) => state.auth);
   const default_values = {
     email: "",
     password: "",
@@ -39,7 +38,6 @@ export const LoginScreen = () => {
   const onNext = () => {
     //@ts-ignore
     router.replace("/(screens)/(home)/musics");
-  
   };
 
   // useEffect(() => {
@@ -65,64 +63,71 @@ export const LoginScreen = () => {
         end={{ x: 1, y: 1 }}
         style={styles.background}
       />
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <View
-          style={{
-            flexDirection: "column",
-            gap: 20,
-          }}
-        >
-          <FormInput
-            error={errors?.email?.message}
-            label="Email"
-            required={"Email is required"}
-            validate={(value: string) => validateEmail(value ?? "")}
-            placeholder="Enter your email"
-            name="email"
-            control={control}
-            editable={true}
-            input_width={"100%"}
-          />
+      <Image
+        source={require("@/assets/images/logo.svg")}
+        style={styles.logo}
+        contentFit="contain"
+      />
+      <View style={styles.containerinner}>
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <View
+            style={{
+              flexDirection: "column",
+              gap: 20,
+            }}
+          >
+            <FormInput
+              error={errors?.email?.message}
+              label="Email"
+              required={"Email is required"}
+              validate={(value: string) => validateEmail(value ?? "")}
+              placeholder="Enter your email"
+              name="email"
+              control={control}
+              editable={true}
+              input_width={"100%"}
+            />
 
-          <FormInput
-            type="password"
-            error={errors?.password?.message}
-            label="Password"
-            required={"Password is required"}
-            placeholder="Enter your password"
-            name="password"
-            control={control}
-            editable={true}
-            input_width={"100%"}
-          />
+            <FormInput
+              type="password"
+              error={errors?.password?.message}
+              label="Password"
+              required={"Password is required"}
+              placeholder="Enter your password"
+              name="password"
+              control={control}
+              editable={true}
+              input_width={"100%"}
+            />
+          </View>
+
+          <CustomButton
+            loading={loading}
+            // button_color={Colors.primaryColor}
+            disabled_color="#C2C0C0"
+            disabled={isDirty === false || isValid === false}
+            onPress={handleSubmit(onSubmit)}
+            text_type={"regular"}
+            text_style={{
+              fontWeight: "400",
+              fontSize: 14,
+              lineHeight: 19.12,
+              textAlign: "center",
+            }}
+            button_style={{
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              height: 48,
+              display: "flex",
+              borderWidth: 0,
+              borderRadius: 8,
+            }}
+          >
+            <Text style={styles.buttonText}>Log In</Text>
+          </CustomButton>
         </View>
-
-        <CustomButton
-          loading={loading}
-          // button_color={Colors.primaryColor}
-          disabled_color="#C2C0C0"
-          disabled={isDirty === false || isValid === false}
-          onPress={handleSubmit(onSubmit)}
-          text_type={"regular"}
-          text_style={{
-            fontWeight: "400",
-            fontSize: 14,
-            lineHeight: 19.12,
-            textAlign: "center",
-          }}
-          button_style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-            height: 48,
-            display: "flex",
-            borderWidth: 0,
-            borderRadius: 8,
-          }}
-        >
-          <Text style={styles.buttonText}>Log In</Text>
-        </CustomButton>
       </View>
     </View>
   );
@@ -131,7 +136,14 @@ export const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#000",
+    // backgroundColor: "#000",
+    // alignItems: "center",
+    // justifyContent: "center",
+    padding:20
+  },
+  containerinner: {
+    flex: 1,
+    // backgroundColor: "#000",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -147,7 +159,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     paddingVertical: 48,
     borderRadius: 8,
-    width: "80%",
+    width: "90%",
     maxWidth: 400,
     flexDirection: "column",
     gap: 20,
@@ -196,5 +208,9 @@ const styles = StyleSheet.create({
     color: "#f87171",
     fontSize: 14,
     marginTop: 8,
+  },
+  logo: {
+    width: 100,
+    height: 100,
   },
 });
