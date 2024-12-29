@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, SafeAreaView } from "react-native";
+import React from "react";
+import { SingleLiveStream } from "@/components/home/livestreams/singleLivestream";
 
 const singleliveStream = () => {
   return (
-    <View>
-      <Text>singleliveStream</Text>
-    </View>
-  )
-}
+    <SafeAreaView style={{ flex: 1 }}>
+      <SingleLiveStream />
+    </SafeAreaView>
+  );
+};
 
-export default singleliveStream
+export default singleliveStream;

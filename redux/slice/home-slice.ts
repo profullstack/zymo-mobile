@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import * as services from "@/services/home";
 import { handleError } from "@/utils/libs";
+import { set } from "lodash";
 // import { handleError } from "@/utils/libs/utils";
 
 
@@ -50,6 +51,18 @@ export const getPodcast = createAsyncThunk(
   }
 )
 
+export const getLivestreams = createAsyncThunk(
+  "getLivestreams",
+  async (data: any) => {
+    try {
+      const response = await services.getDataBySearch(data);
+      console.log("getLivestreams", response?.results?.liveStreams);
+      return response.results.liveStreams;
+    } catch (error) {
+      
+    }
+  }
+)
 
 
 const homeSlice = createSlice({
@@ -76,6 +89,9 @@ const homeSlice = createSlice({
     },
     setPodcastData: (state, action: PayloadAction<any>) => {
       state.podcasts_data = action.payload;
+    },
+    setLivestreamsData: (state, action: PayloadAction<any>) => {
+      state.livestreams_data = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -105,10 +121,24 @@ const homeSlice = createSlice({
       state.error = true;
       state.podcasts_data = null;
     });
+    builder.addCase(getLivestreams.pending, (state) => {
+      state.fetching_livestreams_data = true;
+      state.error = false;
+    });
+    builder.addCase(getLivestreams.fulfilled, (state, action) => {
+      state.fetching_livestreams_data = false;
+      state.livestreams_data = action.payload;
+    });
+    builder.addCase(getLivestreams.rejected, (state) => {
+      state.fetching_livestreams_data = false;
+      state.error = true;
+      state.livestreams_data = null;
+    });
   },
 });
 export const {
   setMusicData,
-  setPodcastData
+  setPodcastData,
+  setLivestreamsData
 } = homeSlice.actions
 export default homeSlice.reducer;

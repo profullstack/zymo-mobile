@@ -8,6 +8,7 @@ import { Image } from "expo-image";
 import { useDispatch, useSelector } from "react-redux";
 import { setMusicData } from "@/redux/slice/home-slice";
 import CaretLeft from "phosphor-react-native/src/icons/CaretLeft";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DrawerLayout = () => {
   const dispatch = useDispatch();
@@ -22,27 +23,36 @@ const DrawerLayout = () => {
           },
           //i dont want to show the default drawer headerleft icon
           headerLeft: () => (
-            <Pressable onPress={() => router.back()} style={{ marginLeft: 14,marginTop:-23 }}>
+            <Pressable
+              onPress={() => {
+                router.back();
+                AsyncStorage.removeItem("liveStreamToPlay")
+                AsyncStorage.removeItem("musicToPlay")
+                AsyncStorage.removeItem("episodes")
+
+              }}
+              style={{ marginLeft: 14, marginTop: -23 }}
+            >
               <CaretLeft size={24} color="white" />
             </Pressable>
           ),
           headerRight: () => (
             <Pressable
-            onPress={() => navigation.toggleDrawer()}
-            style={{ marginRight: 16 }}
-          >
-            {/* <MaterialIcons name="menu" size={24} color="#ffffff" /> */}
-            <Image
-              style={{ height: 20, width: 20 }}
-              contentFit="contain"
-              source={require("@/assets/images/hamburger.svg")}
-            />
-          </Pressable>
-          )
+              onPress={() => navigation.toggleDrawer()}
+              style={{ marginRight: 16 }}
+            >
+              {/* <MaterialIcons name="menu" size={24} color="#ffffff" /> */}
+              <Image
+                style={{ height: 20, width: 20 }}
+                contentFit="contain"
+                source={require("@/assets/images/hamburger.svg")}
+              />
+            </Pressable>
+          ),
         })}
         drawerContent={CustomDrawerContent}
       >
-            <Drawer.Screen
+        <Drawer.Screen
           name="musics" // This is the name of the page and must match the url from root
           options={{
             drawerLabel: "Music",
@@ -69,16 +79,15 @@ const DrawerLayout = () => {
             drawerIcon(props) {
               return (
                 <>
-                <Image
-                style={{ height: 24, width: 24 }}
-                contentFit="contain"
-                source={require("@/assets/images/music.svg")}
-              />
+                  <Image
+                    style={{ height: 24, width: 24 }}
+                    contentFit="contain"
+                    source={require("@/assets/images/music.svg")}
+                  />
                 </>
               );
             },
           }}
-          
         />
         {/* <Drawer.Screen
           name="home" // This is the name of the page and must match the url from root
@@ -145,11 +154,11 @@ const DrawerLayout = () => {
             drawerIcon(props) {
               return (
                 <>
-                <Image
-                style={{ height: 24, width: 24 }}
-                contentFit="contain"
-                source={require("@/assets/images/livetv.svg")}
-              />
+                  <Image
+                    style={{ height: 24, width: 24 }}
+                    contentFit="contain"
+                    source={require("@/assets/images/livetv.svg")}
+                  />
                 </>
               );
             },
@@ -182,17 +191,17 @@ const DrawerLayout = () => {
             drawerIcon(props) {
               return (
                 <>
-                <Image
-                style={{ height: 24, width: 24 }}
-                contentFit="contain"
-                source={require("@/assets/images/books.svg")}
-              />
+                  <Image
+                    style={{ height: 24, width: 24 }}
+                    contentFit="contain"
+                    source={require("@/assets/images/books.svg")}
+                  />
                 </>
               );
             },
           }}
         />
-    
+
         <Drawer.Screen
           name="movies" // This is the name of the page and must match the url from root
           options={{
@@ -220,11 +229,11 @@ const DrawerLayout = () => {
             drawerIcon(props) {
               return (
                 <>
-                <Image
-                style={{ height: 24, width: 24 }}
-                contentFit="contain"
-                source={require("@/assets/images/movies.svg")}
-              />
+                  <Image
+                    style={{ height: 24, width: 24 }}
+                    contentFit="contain"
+                    source={require("@/assets/images/movies.svg")}
+                  />
                 </>
               );
             },
@@ -257,11 +266,11 @@ const DrawerLayout = () => {
             drawerIcon(props) {
               return (
                 <>
-                <Image
-                style={{ height: 24, width: 24 }}
-                contentFit="contain"
-                source={require("@/assets/images/podcasts.svg")}
-              />
+                  <Image
+                    style={{ height: 24, width: 24 }}
+                    contentFit="contain"
+                    source={require("@/assets/images/podcasts.svg")}
+                  />
                 </>
               );
             },

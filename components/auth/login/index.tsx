@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -68,67 +69,75 @@ export const LoginScreen = () => {
         style={styles.logo}
         contentFit="contain"
       />
-      <View style={styles.containerinner}>
-        <View style={styles.formContainer}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <View
-            style={{
-              flexDirection: "column",
-              gap: 20,
-            }}
-          >
-            <FormInput
-              error={errors?.email?.message}
-              label="Email"
-              required={"Email is required"}
-              validate={(value: string) => validateEmail(value ?? "")}
-              placeholder="Enter your email"
-              name="email"
-              control={control}
-              editable={true}
-              input_width={"100%"}
-            />
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        automaticallyAdjustKeyboardInsets={true}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.containerinner}>
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Welcome Back</Text>
+            <View
+              style={{
+                flexDirection: "column",
+                gap: 20,
+              }}
+            >
+              <FormInput
+                error={errors?.email?.message}
+                label="Email"
+                required={"Email is required"}
+                validate={(value: string) => validateEmail(value ?? "")}
+                placeholder="Enter your email"
+                name="email"
+                control={control}
+                editable={true}
+                input_width={"100%"}
+              />
 
-            <FormInput
-              type="password"
-              error={errors?.password?.message}
-              label="Password"
-              required={"Password is required"}
-              placeholder="Enter your password"
-              name="password"
-              control={control}
-              editable={true}
-              input_width={"100%"}
-            />
+              <FormInput
+                type="password"
+                error={errors?.password?.message}
+                label="Password"
+                required={"Password is required"}
+                placeholder="Enter your password"
+                name="password"
+                control={control}
+                editable={true}
+                input_width={"100%"}
+              />
+            </View>
+
+            <CustomButton
+              loading={loading}
+              // button_color={Colors.primaryColor}
+              disabled_color="#C2C0C0"
+              disabled={isDirty === false || isValid === false}
+              onPress={handleSubmit(onSubmit)}
+              text_type={"regular"}
+              text_style={{
+                fontWeight: "400",
+                fontSize: 14,
+                lineHeight: 19.12,
+                textAlign: "center",
+              }}
+              button_style={{
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: 48,
+                display: "flex",
+                borderWidth: 0,
+                borderRadius: 8,
+              }}
+            >
+              <Text style={styles.buttonText}>Log In</Text>
+            </CustomButton>
           </View>
-
-          <CustomButton
-            loading={loading}
-            // button_color={Colors.primaryColor}
-            disabled_color="#C2C0C0"
-            disabled={isDirty === false || isValid === false}
-            onPress={handleSubmit(onSubmit)}
-            text_type={"regular"}
-            text_style={{
-              fontWeight: "400",
-              fontSize: 14,
-              lineHeight: 19.12,
-              textAlign: "center",
-            }}
-            button_style={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-              height: 48,
-              display: "flex",
-              borderWidth: 0,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={styles.buttonText}>Log In</Text>
-          </CustomButton>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -139,7 +148,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "#000",
     // alignItems: "center",
     // justifyContent: "center",
-    padding:20
+    padding: 20,
   },
   containerinner: {
     flex: 1,

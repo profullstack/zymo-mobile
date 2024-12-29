@@ -4,7 +4,7 @@ import { LoginScreen } from "@/components/auth/login";
 
 const login = () => {
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <LoginScreen/>
     </View>
   );
